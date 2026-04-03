@@ -1,0 +1,28 @@
+name: Release Skill Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Package .skill file
+        run: |
+          mkdir -p zhipu-usage
+          cp SKILL.md zhipu-usage/
+          cp -r scripts/ zhipu-usage/
+          cd zhipu-usage && zip -r ../zhipu-usage.skill . && cd ..
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: zhipu-usage.skill
+          generate_release_notes: true
