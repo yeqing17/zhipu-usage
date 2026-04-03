@@ -18,39 +18,60 @@ def query(api_key=None):
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-def fmt_countdown(next_ms):
-    left = max(0, (next_ms - int(time.time() * 1000)) / 60000)
+def bar(pct, n=16):
+    f = int(n * pct / 100)
+    return "█" * f + "░" * (n - f)
+
+def fmt_reset(ms):
+    left = max(0, (ms - int(time.time() * 1000)) / 60000)
     if left >= 1440:
-        return time.strftime("%m/%d", time.localtime(next_ms / 1000))
+        return time.strftime("%m/%d %H:%M", time.localtime(ms / 1000))
     h, m = int(left // 60), int(left % 60)
-    return f"{h}h{m}m"
+    return f"{h}h{m}m后"
+
+TOOL_NAMES = {
+    "search-prime": "搜索",
+    "web-reader": "网页读取",
+    "zread": "深度阅读",
+}
 
 def format_report(data):
     if not data.get("success"):
         return f"❌ {data.get('error', '查询失败')}"
     d = data["data"]
-    level = d.get("level", "?")
+    level = d.get("level", "?").upper()
     limits = d.get("limits", [])
-    lines = []
-    token_reset = ""
-    time_reset = ""
-    token_pct = 0
-    time_pct = 0
-    for lim in limits:
-        if lim["type"] == "TOKENS_LIMIT":
-            token_pct = lim.get("percentage", 0)
+    lines = [f"📋 智谱AI Coding Plan · {level}", ""]
+    for lim in sorted(limits, key=lambda x: 0 if x["type"] == "TOKENS_LIMIT" else 1):
+        t = lim["type"]
+        if t == "TOKENS_LIMIT":
+            pct = lim.get("percentage", 0)
+            unit = lim.get("unit", 5)
+            number = lim.get("number", 1)
             nxt = lim.get("nextResetTime")
+            lines.append(f"🔢 Token [{bar(pct)}] 已用{pct}%")
+            detail = f"{unit}×{number}h滑动窗口"
             if nxt:
-                token_reset = fmt_countdown(nxt)
-        elif lim["type"] == "TIME_LIMIT":
-            time_pct = lim.get("percentage", 0)
+                detail += f" · {fmt_reset(nxt)}"
+            lines.append(f"   {detail}")
+            lines.append("")
+        elif t == "TIME_LIMIT":
+            pct = lim.get("percentage", 0)
+            rem = lim.get("remaining", "?")
+            cur = lim.get("currentValue", 0)
+            total = lim.get("usage", "?")
             nxt = lim.get("nextResetTime")
+            lines.append(f"⏱ 工具调用 {cur}/{total}次 [{bar(pct)}] 剩余{rem}%")
+            detail = "每月重置"
             if nxt:
-                time_reset = fmt_countdown(nxt)
-    lines.append(f"📋 {level.upper()} | Token {token_pct}% | 工具 {time_pct}%")
-    if token_reset:
-        lines.append(f"⏰ Token重置: {token_reset} | 工具重置: {time_reset}")
-    return "\n".join(lines)
+                detail += f" · {fmt_reset(nxt)}"
+            lines.append(f"   {detail}")
+            details = lim.get("usageDetails", [])
+            if details:
+                parts = [f"{TOOL_NAMES.get(dd['modelCode'], dd['modelCode'])}:{dd['usage']}" for dd in details]
+                lines.append(f"   {' · '.join(parts)}")
+            lines.append("")
+    return "\n".join(lines).strip()
 
 if __name__ == "__main__":
     key = sys.argv[1] if len(sys.argv) > 1 else None
