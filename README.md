@@ -22,6 +22,14 @@ OpenClaw Skill，通过智谱AI官方API实时查询 Coding Plan 的配额使用
    搜索:1 · 网页读取:2 · 深度阅读:0
 ```
 
+## 环境要求
+
+- **操作系统**: Linux / Ubuntu
+- **运行环境**: OpenClaw
+- **Python**: 3.8+
+
+> ⚠️ **注意**: 本 Skill 仅兼容 Linux 环境，Windows 暂未支持。
+
 ## 安装
 
 ### GitHub 仓库
