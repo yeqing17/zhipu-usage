@@ -24,7 +24,9 @@ OpenClaw Skill，通过智谱AI官方API实时查询 Coding Plan 的配额使用
 
 ## 安装
 
-### 方式一：下载 .skill 文件
+### GitHub 仓库
+
+**方式一：下载 .skill 文件（最简单）**
 
 从 [Releases](https://github.com/yeqing17/zhipu-usage/releases) 下载最新的 `zhipu-usage.skill` 文件，然后：
 
@@ -32,10 +34,19 @@ OpenClaw Skill，通过智谱AI官方API实时查询 Coding Plan 的配额使用
 openclaw skills install zhipu-usage.skill
 ```
 
-### 方式二：手动安装
+**方式二：手动安装**
 
 ```bash
 git clone https://github.com/yeqing17/zhipu-usage.git
+cp -r zhipu-usage ~/.openclaw/skills/zhipu-usage
+```
+
+### 公司内网仓库
+
+仅支持手动安装：
+
+```bash
+git clone https://git.ipanel.cn/git/iskills/zhipu-usage.git
 cp -r zhipu-usage ~/.openclaw/skills/zhipu-usage
 ```
 

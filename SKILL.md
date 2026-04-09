@@ -1,6 +1,7 @@
 ---
 name: zhipu-usage
 description: 智谱AI / Z.ai Coding Plan 用量查询。当用户询问智谱、zhipu、z.ai 的配额、用量、剩余额度、Token限额时触发。
+version: 1.0.0
 ---
 
 # 智谱AI Coding Plan 用量查询
